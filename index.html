@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Glitch-Tape Rhythm Runner (Rush E Edition)</title>
+    <title>ШСК ФИДЖИТАЛ ПОРТАЛ</title>
     <style>
+        :root {
+            --color-pink: #ff007f;
+            --color-cyan: #00f2fe;
+            --color-orange: #ff5e00;
+            --color-green: #39ff14;
+            --color-dark: #0d0e15;
+            --font-family: 'Courier New', Courier, monospace;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,71 +24,224 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0d0e15;
-            font-family: 'Courier New', Courier, monospace;
-            color: #00f2fe;
-            transition: background-color 0.5s ease;
+            background-color: var(--color-dark);
+            font-family: var(--font-family);
+            color: #fff;
         }
-        #game-container {
+        #app-container {
             position: relative;
             width: 100%;
             height: 100%;
             max-width: 600px;
             margin: 0 auto;
             background: radial-gradient(circle at center, #1b1c2b 0%, #0d0e15 100%);
-            border-left: 2px solid var(--color-pink, #ff007f);
-            border-right: 2px solid var(--color-cyan, #00f2fe);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
+            border-left: 2px solid var(--color-pink);
+            border-right: 2px solid var(--color-cyan);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
+
+        /* Экраны */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            background: inherit;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* Шапка */
         header {
             padding: 15px;
             text-align: center;
             border-bottom: 1px dashed rgba(0, 242, 254, 0.3);
+            background: rgba(13, 14, 21, 0.8);
             z-index: 10;
         }
-        h1 {
-            font-size: 1.5rem;
+        header h1 {
+            font-size: 1.4rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--color-cyan, #00f2fe), 0 0 20px var(--color-pink, #ff007f);
-            color: #fff;
-            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--color-cyan), 0 0 20px var(--color-pink);
         }
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--color-pink, #ff007f);
+        .header-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-pink);
             text-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
+            margin-top: 2px;
         }
-        #canvas-container {
+
+        /* ДАШБОРД (ГЛАВНЫЙ ЭКРАН) */
+        #dashboard-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        .welcome-text {
+            font-size: 0.9rem;
+            text-align: center;
+            color: #a0a5c0;
+            max-width: 320px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .discipline-card {
+            width: 100%;
+            max-width: 350px;
+            background: rgba(27, 28, 43, 0.6);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .discipline-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+        .discipline-card:hover::after {
+            left: 100%;
+        }
+        .discipline-card:active {
+            transform: scale(0.98);
+        }
+        .card-rhythm { border-color: var(--color-pink); }
+        .card-rhythm .card-icon { color: var(--color-pink); text-shadow: 0 0 8px var(--color-pink); }
+        .card-soccer { border-color: var(--color-green); }
+        .card-soccer .card-icon { color: var(--color-green); text-shadow: 0 0 8px var(--color-green); }
+        .card-basket { border-color: var(--color-orange); }
+        .card-basket .card-icon { color: var(--color-orange); text-shadow: 0 0 8px var(--color-orange); }
+
+        .card-icon {
+            font-size: 2.2rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        .card-desc {
+            font-size: 0.75rem;
+            color: #a0a5c0;
+            line-height: 1.2;
+        }
+
+        /* ОБЩИЙ КЛАСС ДЛЯ ИГРОВЫХ ЭКРАНОВ */
+        .game-area {
             position: relative;
             flex-grow: 1;
             width: 100%;
+            background: radial-gradient(circle at center, #151624 0%, #08090f 100%);
         }
         canvas {
             display: block;
             width: 100%;
             height: 100%;
         }
-        #ui-overlay {
+
+        /* Наложения UI (Паузы, меню выбора, конец игры) */
+        .overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: rgba(13, 14, 21, 0.94);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(13, 14, 21, 0.92);
-            z-index: 20;
-            transition: opacity 0.3s ease;
+            padding: 20px;
             text-align: center;
-            padding: 15px;
-            overflow-y: auto;
+            z-index: 20;
         }
+        .btn {
+            background: transparent;
+            border: 2px solid var(--color-cyan);
+            color: #fff;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+            border-radius: 5px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .btn:active {
+            transform: scale(0.95);
+            background: var(--color-cyan);
+            color: #0d0e15;
+        }
+        .btn-back {
+            background: rgba(255, 0, 127, 0.1);
+            border-color: var(--color-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+        }
+        .btn-back:active {
+            background: var(--color-pink);
+            color: #fff;
+        }
+
+        /* Доски очков */
+        .score-board {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #fff;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .combo-board {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--color-pink);
+            text-shadow: 0 0 5px var(--color-pink);
+            z-index: 10;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* МУЗЫКАЛЬНЫЕ НАСТРОЙКИ ДЛЯ РИТМА */
         .track-selection {
             width: 100%;
             max-width: 320px;
@@ -106,65 +267,56 @@
             align-items: center;
         }
         .track-btn.active {
-            border-color: var(--color-cyan, #00f2fe);
+            border-color: var(--color-pink);
             color: #fff;
-            background: rgba(0, 242, 254, 0.15);
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
-        }
-        .track-btn:hover {
-            background: rgba(0, 242, 254, 0.08);
+            background: rgba(255, 0, 127, 0.15);
+            box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
         }
         .track-bpm {
             font-size: 0.75rem;
-            opacity: 0.8;
-            background: var(--color-pink, #ff007f);
+            background: var(--color-cyan);
             color: #0d0e15;
             padding: 2px 6px;
             border-radius: 3px;
         }
-        .btn {
-            background: transparent;
-            border: 2px solid var(--color-cyan, #00f2fe);
-            color: #fff;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
+
+        /* Ползунок калибровки задержки */
+        .calibration-box {
+            width: 100%;
+            max-width: 320px;
             margin-top: 15px;
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-            border-radius: 5px;
-            font-family: inherit;
-            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 10px 15px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            text-align: left;
         }
-        .btn:active {
-            transform: scale(0.95);
-            background: var(--color-cyan, #00f2fe);
-            color: #0d0e15;
-            box-shadow: 0 0 20px var(--color-cyan, #00f2fe);
+        .calibration-box label {
+            font-size: 0.75rem;
+            color: var(--color-cyan);
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
-        #score-board {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 1.1rem;
+        .calibration-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .calibration-input-row input[type="range"] {
+            flex-grow: 1;
+            accent-color: var(--color-cyan);
+            cursor: pointer;
+        }
+        .calibration-val {
+            font-size: 0.8rem;
             font-weight: bold;
-            text-shadow: 0 0 5px var(--color-cyan, #00f2fe);
-            z-index: 10;
-            pointer-events: none;
+            min-width: 60px;
+            text-align: right;
+            color: #fff;
         }
-        #combo-board {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--color-pink, #ff007f);
-            text-shadow: 0 0 5px var(--color-pink, #ff007f);
-            z-index: 10;
-            pointer-events: none;
-            display: none;
-        }
+
+        /* Нижний ритм-индикатор */
         #rhythm-indicator {
             position: absolute;
             bottom: 30px;
@@ -184,672 +336,1017 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background-color: var(--color-pink, #ff007f);
-            box-shadow: 0 0 10px var(--color-pink, #ff007f);
+            background-color: var(--color-pink);
+            box-shadow: 0 0 10px var(--color-pink);
             transition: transform 0.05s ease-out;
         }
-        .flash-cyan {
+        .flash-indicator {
+            animation: flash-ind 0.1s ease-out;
+        }
+        .flash-core {
             animation: flash-c 0.1s ease-out;
         }
-        .flash-pink {
-            animation: flash-p 0.1s ease-out;
-        }
-        @keyframes flash-c {
-            0% { border-color: var(--color-cyan, #00f2fe); box-shadow: 0 0 15px var(--color-cyan, #00f2fe); }
+        @keyframes flash-ind {
+            0% { border-color: #fff; box-shadow: 0 0 15px #fff; }
             100% { border-color: rgba(0, 242, 254, 0.3); }
         }
-        @keyframes flash-p {
-            0% { background-color: #fff; box-shadow: 0 0 20px var(--color-pink, #ff007f); transform: scale(1.8); }
-            100% { background-color: var(--color-pink, #ff007f); box-shadow: 0 0 10px var(--color-pink, #ff007f); transform: scale(1); }
+        @keyframes flash-c {
+            0% { background-color: #fff; box-shadow: 0 0 20px #fff; transform: scale(1.8); }
+            100% { background-color: var(--color-pink); box-shadow: 0 0 10px var(--color-pink); transform: scale(1); }
         }
-        .instructions {
-            font-size: 0.85rem;
-            line-height: 1.4;
-            color: #a0a5c0;
-            margin-top: 10px;
-            max-width: 340px;
+
+        .pulse-text {
+            animation: pulse-title 1.5s infinite alternate;
         }
-        .highlight {
-            color: var(--color-cyan, #00f2fe);
-            font-weight: bold;
+        @keyframes pulse-title {
+            0% { text-shadow: 0 0 10px var(--color-cyan); }
+            100% { text-shadow: 0 0 20px var(--color-pink), 0 0 30px var(--color-pink); }
         }
-        .pink-highlight {
-            color: var(--color-pink, #ff007f);
-            font-weight: bold;
+
+        #music-source-info {
+            font-size: 0.75rem;
+            color: var(--color-cyan);
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--color-cyan);
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <header>
-        <h1>ГЛИЧ-КАССЕТА</h1>
-        <div class="subtitle">ФИДЖИТАЛ РИТМ-РАННЕР</div>
-    </header>
+<div id="app-container">
+    
+    <!-- 1. ЭКРАН: ГЛАВНЫЙ ДАШБОРД -->
+    <div id="screen-dashboard" class="screen active">
+        <header>
+            <h1 class="pulse-text">ФИДЖИТАЛ ШСК</h1>
+            <div class="header-subtitle">СПОРТИВНО-ТЕХНОЛОГИЧЕСКИЙ ПОРТАЛ</div>
+        </header>
 
-    <div id="canvas-container">
-        <div id="score-board">СЧЕТ: <span id="score-val">0</span></div>
-        <div id="combo-board">КОМБО: x<span id="combo-val">1</span></div>
-        
-        <canvas id="gameCanvas"></canvas>
+        <div id="dashboard-content">
+            <p class="welcome-text">
+                Добро пожаловать в цифровое крыло школьного спортивного клуба! Выберите фиджитал-дисциплину для тренировки.
+            </p>
 
-        <div id="ui-overlay">
-            <h2 id="overlay-title" style="text-shadow: 0 0 10px #00f2fe;">ВЫБЕРИТЕ СИСТЕМНЫЙ ТРЕК</h2>
-            
-            <div class="track-selection">
-                <button class="track-btn active" onclick="selectTrack(0)">
-                    <span>🎹 RUSH E (Meme Legend)</span>
-                    <span class="track-bpm">160 BPM</span>
-                </button>
-                <button class="track-btn" onclick="selectTrack(1)">
-                    <span>⚡ NEON CYBERPUNK</span>
-                    <span class="track-bpm">130 BPM</span>
-                </button>
-                <button class="track-btn" onclick="trackPrePlay(2)">
-                    <span>👾 RETRO 8-BIT CHIP</span>
-                    <span class="track-bpm">110 BPM</span>
-                </button>
+            <div class="discipline-card card-rhythm" onclick="switchScreen('screen-rhythm')">
+                <div class="card-icon">👾</div>
+                <div class="card-info">
+                    <div class="card-title" style="color: var(--color-pink);">Ритм-Симулятор</div>
+                    <div class="card-desc">Музыкальный раннер "Глич-Кассета". СИНХРОННЫЙ АНАЛИЗАТОР РИТМА ДЛЯ MP3!</div>
+                </div>
             </div>
 
-            <p class="instructions" id="overlay-desc">
-                Легендарная <span class="highlight">RUSH E</span> заставит твою кассету лететь на пределе возможностей! <br>
-                Попадай в безумный клавишный ритм.
-            </p>
-            <button class="btn" id="start-btn">СТАРТ</button>
+            <div class="discipline-card card-soccer" onclick="switchScreen('screen-soccer')">
+                <div class="card-icon">⚽</div>
+                <div class="card-info">
+                    <div class="card-title" style="color: var(--color-green);">Футбольное двоеборье</div>
+                    <div class="card-desc">Игра "Синтез-Пенальти". Синхронизируй цифровой затвор и пробей физического вратаря!</div>
+                </div>
+            </div>
+
+            <div class="discipline-card card-basket" onclick="switchScreen('screen-basketball')">
+                <div class="card-icon">🏀</div>
+                <div class="card-info">
+                    <div class="card-title" style="color: var(--color-orange);">Баскетбольное двоеборье</div>
+                    <div class="card-desc">Игра "Кэн-Данк". Запусти баскетбольный мяч с огненным шлейфом баллончика точно в кольцо!</div>
+                </div>
+            </div>
         </div>
 
-        <div id="rhythm-indicator">
-            <div id="rhythm-core"></div>
+        <footer style="padding: 15px; text-align: center; font-size: 0.7rem; color: #4a4d6b; border-top: 1px solid rgba(255,255,255,0.03);">
+            МОБИЛЬНАЯ ВЕРСИЯ ШСК • РАЗРАБОТАНО НА НЕЙРОСЕТЯХ
+        </footer>
+    </div>
+
+
+    <!-- 2. ЭКРАН: РИТМ-СИМУЛЯТОР -->
+    <div id="screen-rhythm" class="screen">
+        <header>
+            <h1>ГЛИЧ-КАССЕТА</h1>
+            <div class="header-subtitle">РИТМ-СИМУЛЯТОР • ШСК EDITION</div>
+        </header>
+
+        <div class="game-area">
+            <div class="score-board">СЧЕТ: <span id="rhythm-score-val">0</span></div>
+            <div class="combo-board" id="rhythm-combo-board">КОМБО: x<span id="rhythm-combo-val">1</span></div>
+            
+            <canvas id="rhythmCanvas"></canvas>
+
+            <div class="overlay" id="rhythm-overlay">
+                <h2 style="text-shadow: 0 0 10px var(--color-pink); margin-bottom: 5px;">ВЫБЕРИ СИСТЕМНЫЙ ТРЕК</h2>
+                
+                <div class="track-selection">
+                    <button class="track-btn active" onclick="selectRhythmTrack(0)">
+                        <span>🎹 RUSH E (MP3-анализатор)</span>
+                        <span class="track-bpm">160 BPM</span>
+                    </button>
+                    <button class="track-btn" onclick="selectRhythmTrack(1)">
+                        <span>⚡ NEON CYBERPUNK (Synth)</span>
+                        <span class="track-bpm">130 BPM</span>
+                    </button>
+                </div>
+
+                <div id="music-source-info">Режим автоопределения аудио...</div>
+
+                <!-- БЛОК КАЛИБРОВКИ ЗАДЕРЖКИ (Под беспроводные наушники) -->
+                <div class="calibration-box">
+                    <label for="latency-slider">Калибровка звука (для Bluetooth):</label>
+                    <div class="calibration-input-row">
+                        <input type="range" id="latency-slider" min="-250" max="250" value="0" oninput="updateLatencyLabel(this.value)">
+                        <div class="calibration-val" id="latency-val">0 мс</div>
+                    </div>
+                </div>
+
+                <p class="instructions" style="font-size: 0.75rem; color: #a0a5c0; max-width: 340px; line-height: 1.3; margin-top: 10px;">
+                    <span class="highlight">РЕАЛЬНОЕ СЧИТЫВАНИЕ РИТМА:</span> Игра использует <span class="pink-highlight">Web Audio API</span>, чтобы улавливать резкие пианино-аккорды в песне и синхронизировать индикатор с тем, что ты слышишь!
+                </p>
+                <div style="display:flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-back" onclick="exitToDashboard()">МЕНЮ</button>
+                    <button class="btn" onclick="startRhythmGame()">СТАРТ</button>
+                </div>
+            </div>
+
+            <div id="rhythm-indicator">
+                <div id="rhythm-core"></div>
+            </div>
         </div>
     </div>
+
+
+    <!-- 3. ЭКРАН: ФУТБОЛЬНОЕ ДВОЕБОРЬЕ -->
+    <div id="screen-soccer" class="screen">
+        <header>
+            <h1 style="text-shadow: 0 0 10px var(--color-green);">СИНТЕЗ-ПЕНАЛЬТИ</h1>
+            <div class="header-subtitle" style="color: var(--color-green);">ФУТБОЛЬНОЕ ДВОЕБОРЬЕ</div>
+        </header>
+
+        <div class="game-area">
+            <div class="score-board">ЗАБИТО: <span id="soccer-score-val">0</span> / 10</div>
+            
+            <canvas id="soccerCanvas"></canvas>
+
+            <div class="overlay" id="soccer-overlay">
+                <h2 style="text-shadow: 0 0 10px var(--color-green); margin-bottom: 5px;" id="soccer-overlay-title">ЦИФРОВОЙ СИНТЕЗ</h2>
+                <p class="instructions" id="soccer-overlay-desc" style="font-size: 0.8rem; color: #a0a5c0; max-width: 320px; margin-bottom: 10px;">
+                    Уникальное двоеборье! Сначала останови <span class="highlight" style="color: var(--color-green)">цифровой затвор</span> в зеленой зоне идеального баланса, а затем соверши <span class="highlight" style="color: var(--color-green)">точный удар</span> мимо скользящего вратаря!
+                </p>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn btn-back" onclick="exitToDashboard()">МЕНЮ</button>
+                    <button class="btn" style="border-color: var(--color-green);" onclick="startSoccerGame()" id="soccer-start-btn">СТАРТ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 4. ЭКРАН: БАСКЕТБОЛЬНОЕ ДВОЕБОРЬЕ -->
+    <div id="screen-basketball" class="screen">
+        <header>
+            <h1 style="text-shadow: 0 0 10px var(--color-orange);">КЭН-ДАНК</h1>
+            <div class="header-subtitle" style="color: var(--color-orange);">БАСКЕТБОЛЬНОЕ ДВОЕБОРЬЕ</div>
+        </header>
+
+        <div class="game-area">
+            <div class="score-board">ПОПАДАНИЙ: <span id="basket-score-val">0</span></div>
+            
+            <canvas id="basketCanvas"></canvas>
+
+            <div class="overlay" id="basket-overlay">
+                <h2 style="text-shadow: 0 0 10px var(--color-orange); margin-bottom: 5px;" id="basket-overlay-title">СТРИТ-АРТ БАСКЕТБОЛ</h2>
+                <p class="instructions" id="basket-overlay-desc" style="font-size: 0.8rem; color: #a0a5c0; max-width: 320px; margin-bottom: 10px;">
+                    Баллончик-маскот «КЭН» закидывает огненные мячи в движущееся кольцо! <br>
+                    <span class="highlight" style="color: var(--color-orange)">Нажимай на экран</span>, чтобы регулировать силу прыжка/броска и совершить нереальный Slam-Dunk!
+                </p>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn btn-back" onclick="exitToDashboard()">МЕНЮ</button>
+                    <button class="btn" style="border-color: var(--color-orange);" onclick="startBasketGame()" id="basket-start-btn">СТАРТ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const startBtn = document.getElementById('start-btn');
-    const uiOverlay = document.getElementById('ui-overlay');
-    const overlayTitle = document.getElementById('overlay-title');
-    const overlayDesc = document.getElementById('overlay-desc');
-    const scoreVal = document.getElementById('score-val');
-    const comboVal = document.getElementById('combo-val');
-    const comboBoard = document.getElementById('combo-board');
-    const rhythmIndicator = document.getElementById('rhythm-indicator');
-    const rhythmCore = document.getElementById('rhythm-core');
-
-    function resizeCanvas() {
-        const container = document.getElementById('canvas-container');
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // Музыкальные ноты для RUSH E (знаменитое вступление и агрессивное пианино)
-    // Нота E (Ми) - основа всего трека, повторяется с нарастанием!
-    const note_E = 329.63; // E4
-    const note_B = 246.94; // B3
-    const note_C = 261.63; // C4
-    const note_D = 293.66; // D4
-    const note_A = 220.00; // A3
-
-    const rushESequence = [
-        note_E, note_E, note_E, note_E, // "E E E E"
-        note_B, note_C, note_D, note_E, // разгон
-        note_E, note_E, note_E, note_E,
-        note_D, note_C, note_B, note_A,
-        note_E, note_E, note_E, note_E,
-        note_C, note_D, note_E, note_A,
-        note_E, note_E, note_E, note_E
-    ];
-
-    const tracks = [
-        {
-            name: "RUSH E",
-            bpm: 160, // Ураганный темп!
-            color1: "#e60000", // Агрессивный огненно-красный (Клавиши рояля в огне!)
-            color2: "#ffffff", // Чистый белый
-            synthType: "square", // Классический острый звук синтезатора
-            notes: rushESequence,
-            speed: 8.5 // Реально быстрая игра!
-        },
-        {
-            name: "NEON CYBERPUNK",
-            bpm: 130,
-            color1: "#ff007f",
-            color2: "#00f2fe",
-            synthType: "sawtooth",
-            notes: [130.81, 146.83, 164.81, 196.00, 220.00],
-            speed: 6.5
-        },
-        {
-            name: "RETRO 8-BIT CHIP",
-            bpm: 110,
-            color1: "#e0a96d",
-            color2: "#a12559",
-            synthType: "triangle",
-            notes: [261.63, 293.66, 329.63, 392.00, 440.00],
-            speed: 5.2
-        }
-    ];
-
-    let currentTrackIndex = 0;
-    let currentTrack = tracks[0];
-
-    function selectTrack(index) {
-        currentTrackIndex = index;
-        currentTrack = tracks[index];
-
-        document.documentElement.style.setProperty('--color-pink', currentTrack.color1);
-        document.documentElement.style.setProperty('--color-cyan', currentTrack.color2);
-
-        const buttons = document.querySelectorAll('.track-btn');
-        buttons.forEach((btn, idx) => {
-            if (idx === index) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+    // НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
         });
+        document.getElementById(screenId).classList.add('active');
 
-        overlayTitle.style.textShadow = `0 0 10px ${currentTrack.color2}, 0 0 20px ${currentTrack.color1}`;
-        
-        if (index === 0) {
-            overlayDesc.innerHTML = 'Легендарная <span class="highlight">RUSH E</span> заставит твою кассету лететь на пределе возможностей! <br>Попадай в безумный клавишный ритм.';
-        } else {
-            overlayDesc.innerHTML = 'Каждый трек меняет <span class="highlight">ритм, скорость игры и визуальный стиль</span> кассеты! <br>Прыгай точно <span class="pink-highlight">в такт индикатору</span>.';
-        }
+        setTimeout(() => {
+            resizeRhythmCanvas();
+            resizeSoccerCanvas();
+            resizeBasketCanvas();
+        }, 50);
+
+        stopAllGames();
     }
 
-    // Для вызова функции из onclick в HTML
-    window.selectTrack = selectTrack;
-    window.trackPrePlay = selectTrack;
-
-    // Звуковой движок
-    let audioCtx = null;
-    let nextBeatTime = 0;
-    let audioLoopId = null;
-
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        nextBeatTime = audioCtx.currentTime + 0.1;
-        scheduler();
+    function exitToDashboard() {
+        stopAllGames();
+        switchScreen('screen-dashboard');
     }
 
-    function playKick(time) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.frequency.setValueAtTime(150, time);
-        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.12);
-
-        // Для Rush E делаем плотный упругий бит
-        const vol = currentTrackIndex === 0 ? 0.9 : 0.7;
-        gain.gain.setValueAtTime(vol, time);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.14);
-
-        osc.start(time);
-        osc.stop(time + 0.15);
+    function stopAllGames() {
+        stopRhythm();
+        stopSoccer();
+        stopBasket();
     }
 
-    let noteIndex = 0;
-    function playSynth(time, step) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = currentTrack.synthType;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+    // Калибровка задержки звука
+    let latencyOffset = 0;
+    function updateLatencyLabel(val) {
+        latencyOffset = parseInt(val);
+        const sign = latencyOffset > 0 ? "+" : "";
+        document.getElementById('latency-val').textContent = `${sign}${latencyOffset} мс`;
+    }
 
-        let freq = currentTrack.notes[noteIndex % currentTrack.notes.length];
+    // ==========================================
+    // 👾 ДИСЦИПЛИНА 1: РИТМ-СИМУЛЯТОР "ГЛИЧ-КАССЕТА"
+    // ==========================================
+    const rCanvas = document.getElementById('rhythmCanvas');
+    const rCtx = rCanvas.getContext('2d');
+    const rOverlay = document.getElementById('rhythm-overlay');
+    const rScoreVal = document.getElementById('rhythm-score-val');
+    const rComboVal = document.getElementById('rhythm-combo-val');
+    const rComboBoard = document.getElementById('rhythm-combo-board');
+    const rIndicator = document.getElementById('rhythm-indicator');
+    const rCore = document.getElementById('rhythm-core');
+    const musicSourceInfo = document.getElementById('music-source-info');
+
+    function resizeRhythmCanvas() {
+        const parent = rCanvas.parentElement;
+        rCanvas.width = parent.clientWidth;
+        rCanvas.height = parent.clientHeight;
+    }
+
+    // НАСТРОЙКИ ТРЕКОВ
+    const rTracks = [
+        { 
+            name: "RUSH E", 
+            bpm: 160, 
+            color1: "#e60000", 
+            color2: "#ffffff", 
+            synth: "square", 
+            notes: [329.63, 329.63, 329.63, 246.94, 261.63, 293.66, 329.63], 
+            speed: 8.5,
+            mp3Url: "./rushe.mp3",
+            mp3Loaded: false
+        },
+        { 
+            name: "NEON CYBERPUNK", 
+            bpm: 130, 
+            color1: "#ff007f", 
+            color2: "#00f2fe", 
+            synth: "sawtooth", 
+            notes: [130.81, 146.83, 164.81, 196.00, 220.00], 
+            speed: 6.2,
+            mp3Url: null,
+            mp3Loaded: false
+        }
+    ];
+    let rCurrentTrackIndex = 0;
+    let rCurrentTrack = rTracks[0];
+
+    // Аудиосистема
+    let rAudioCtx = null;
+    let rAnalyser = null;
+    let rSourceNode = null;
+    let rNextBeat = 0, rAudioLoop = null, rStepCount = 0;
+    let rGameActive = false, rScore = 0, rCombo = 1, rBgPulse = 0, rLastBeatTime = 0;
+    let rObstacles = [], rObstacleTimer = 0, rParticles = [], rFeedbackText = "", rFeedbackColor = "#fff", rFeedbackTimer = 0;
+    let realAudio = null; 
+
+    // Переменные для считывания частот (beat detection)
+    let fDataArray = null;
+    let energyHistory = [];
+    const maxHistoryLength = 20;
+
+    const rPlayer = { x: 80, y: 0, width: 60, height: 40, vy: 0, isJumping: false, angle: 0, targetAngle: 0, reel: 0 };
+
+    // Проверка файла на сервере
+    function checkMP3File() {
+        if (!rCurrentTrack.mp3Url) {
+            musicSourceInfo.textContent = "🎹 Режим: 8-битный синтезатор";
+            musicSourceInfo.style.color = "var(--color-pink)";
+            return;
+        }
+
+        const tempAudio = new Audio();
+        tempAudio.src = rCurrentTrack.mp3Url;
         
-        // Специфический ураганный проигрыш для Rush E!
-        if (currentTrackIndex === 0) {
-            // Быстрые перебежки между нотами "E"
-            if (step % 2 === 0) {
-                freq = note_E;
-            } else {
-                freq = currentTrack.notes[Math.floor(Math.random() * currentTrack.notes.length)];
+        tempAudio.addEventListener('canplaythrough', () => {
+            rCurrentTrack.mp3Loaded = true;
+            musicSourceInfo.innerHTML = "🎧 <span style='color: #39ff14;'>НАЙДЕН ФАЙЛ MP3!</span> Считывание реальных частот.";
+            musicSourceInfo.style.color = "#39ff14";
+        }, { once: true });
+
+        tempAudio.addEventListener('error', () => {
+            rCurrentTrack.mp3Loaded = false;
+            musicSourceInfo.innerHTML = "🎹 <span style='color: #ff007f;'>Файл rushe.mp3 не найден.</span> Включен синтез.";
+            musicSourceInfo.style.color = "var(--color-pink)";
+        }, { once: true });
+    }
+
+    setTimeout(checkMP3File, 100);
+
+    function selectRhythmTrack(idx) {
+        rCurrentTrackIndex = idx;
+        rCurrentTrack = rTracks[idx];
+        const btns = document.querySelectorAll('#screen-rhythm .track-btn');
+        btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+        checkMP3File();
+    }
+
+    function initRhythmAudio() {
+        if (!rAudioCtx) rAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (rAudioCtx.state === 'suspended') rAudioCtx.resume();
+
+        // ЕСТЬ РЕАЛЬНЫЙ ТРЕК
+        if (rCurrentTrack.mp3Loaded && rCurrentTrack.mp3Url) {
+            if (realAudio) {
+                realAudio.pause();
+                realAudio = null;
             }
-            if (step % 16 >= 12) {
-                // Финал такта - высокая взрывная нота E!
-                freq *= 2; 
+            realAudio = new Audio(rCurrentTrack.mp3Url);
+            realAudio.crossOrigin = "anonymous";
+            realAudio.loop = true;
+            realAudio.volume = 0.8;
+
+            // Настраиваем АНАЛИЗАТОР ЧАСТОТ Web Audio API
+            if (!rAnalyser) {
+                rAnalyser = rAudioCtx.createAnalyser();
+                rAnalyser.fftSize = 128; // Быстрый анализ для точности переходных процессов (транзиентов)
+                const bufferLength = rAnalyser.frequencyBinCount;
+                fDataArray = new Uint8Array(bufferLength);
             }
-            noteIndex++;
-        } else {
-            // Для остальных треков обычный алгоритм
-            if (step % 4 === 0) freq *= 1.5;
-            if (step % 6 === 0) noteIndex = Math.floor(Math.random() * currentTrack.notes.length);
+
+            try {
+                // Создаем источник из HTML5 Audio элемента
+                if (rSourceNode) {
+                    rSourceNode.disconnect();
+                }
+                rSourceNode = rAudioCtx.createMediaElementSource(realAudio);
+                rSourceNode.connect(rAnalyser);
+                rAnalyser.connect(rAudioCtx.destination);
+            } catch (e) {
+                // Если элемент уже подключен к контексту, просто используем его
+                console.log("Ренод переиспользован");
+            }
+
+            realAudio.play();
+            energyHistory = [];
+        } 
+        // НЕТ ФАЙЛА - ПИЛИКАЕМ СИНТЕЗАТОРОМ
+        else {
+            rNextBeat = rAudioCtx.currentTime + 0.1;
+            rStepCount = 0;
+            rhythmScheduler();
         }
-
-        osc.frequency.setValueAtTime(freq, time);
-        
-        const volume = currentTrackIndex === 0 ? 0.07 : (currentTrack.synthType === 'sawtooth' ? 0.08 : 0.14);
-        gain.gain.setValueAtTime(volume, time);
-        gain.gain.linearRampToValueAtTime(volume * 0.7, time + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
-
-        osc.start(time);
-        osc.stop(time + 0.2);
     }
 
-    let stepCount = 0;
-    function scheduler() {
-        // Каждые 1/8 такта (в два раза быстрее бочки для Rush E, чтобы передать клавишный ураган!)
-        const beatInterval = (60 / currentTrack.bpm) / (currentTrackIndex === 0 ? 2 : 1);
-        
-        while (nextBeatTime < audioCtx.currentTime + 0.1) {
-            // Бочка бьет только на каждый основной бит
-            if (currentTrackIndex !== 0 || stepCount % 2 === 0) {
-                playKick(nextBeatTime);
-                
-                const scheduleDelay = (nextBeatTime - audioCtx.currentTime) * 1000;
-                setTimeout(triggerBeatVisual, Math.max(0, scheduleDelay));
+    // ДИНАМИЧЕСКИЙ СЧИТЫВАТЕЛЬ РИТМА MP3
+    // Выполняется на каждом кадре отрисовки экрана
+    function analyzeAudioRhythm() {
+        if (!rGameActive || !realAudio || realAudio.paused || !rAnalyser || !fDataArray) return;
+
+        rAnalyser.getByteFrequencyData(fDataArray);
+
+        // Для Rush E (пианино) важнее всего средние и высокие частоты, где происходят удары клавиш
+        // Считаем энергию в поддиапазоне от 10 до 45 бина (примерно от 170 до 800 Гц)
+        let subBandEnergy = 0;
+        const startBin = 6;
+        const endBin = 38;
+        for (let i = startBin; i <= endBin; i++) {
+            subBandEnergy += fDataArray[i];
+        }
+        subBandEnergy /= (endBin - startBin + 1);
+
+        // Храним историю энергий для расчета скользящего среднего порога
+        energyHistory.push(subBandEnergy);
+        if (energyHistory.length > maxHistoryLength) {
+            energyHistory.shift();
+        }
+
+        // Вычисляем среднюю энергию окружения
+        let avgEnergy = 0;
+        for (let i = 0; i < energyHistory.length; i++) {
+            avgEnergy += energyHistory[i];
+        }
+        avgEnergy /= energyHistory.length;
+
+        // Коэффициент чувствительности: чем выше подскочила энергия над средней, тем вернее это удар клавиши
+        const dynamicThreshold = 1.35; 
+        const minEnergyGate = 15; // отсекаем фоновые шумы и тишину
+        const timeGap = 140; // минимальное расстояние между битами в мс для Rush E
+
+        const now = Date.now();
+        if (subBandEnergy > avgEnergy * dynamicThreshold && subBandEnergy > minEnergyGate && (now - rLastBeatTime > timeGap)) {
+            // МЫ РАСПОЗНАЛИ УДАР КЛАВИШИ В MP3!
+            triggerRhythmBeatVisual();
+        }
+    }
+
+    // Процедурный синтезатор (запасной вариант)
+    function rhythmScheduler() {
+        const beatInterval = (60 / rCurrentTrack.bpm) / (rCurrentTrackIndex === 0 ? 2 : 1);
+        while (rNextBeat < rAudioCtx.currentTime + 0.1) {
+            if (rCurrentTrackIndex !== 0 || rStepCount % 2 === 0) {
+                const osc = rAudioCtx.createOscillator();
+                const gain = rAudioCtx.createGain();
+                osc.connect(gain); gain.connect(rAudioCtx.destination);
+                osc.frequency.setValueAtTime(150, rNextBeat);
+                osc.frequency.exponentialRampToValueAtTime(0.01, rNextBeat + 0.12);
+                gain.gain.setValueAtTime(0.8, rNextBeat);
+                gain.gain.exponentialRampToValueAtTime(0.01, rNextBeat + 0.14);
+                osc.start(rNextBeat); osc.stop(rNextBeat + 0.15);
+
+                const delay = (rNextBeat - rAudioCtx.currentTime) * 1000;
+                setTimeout(triggerRhythmBeatVisual, Math.max(0, delay));
             }
             
-            // Синтезатор херачит в два раза быстрее!
-            playSynth(nextBeatTime, stepCount);
+            const oscS = rAudioCtx.createOscillator();
+            const gainS = rAudioCtx.createGain();
+            oscS.type = rCurrentTrack.synth;
+            oscS.connect(gainS); gainS.connect(rAudioCtx.destination);
+            let freq = rCurrentTrack.notes[rStepCount % rCurrentTrack.notes.length];
+            if (rCurrentTrackIndex === 0) {
+                if (rStepCount % 2 === 0) freq = 329.63; // E4
+                if (rStepCount % 16 >= 12) freq *= 1.5;
+            }
+            oscS.frequency.setValueAtTime(freq, rNextBeat);
+            const vol = rCurrentTrackIndex === 0 ? 0.06 : 0.1;
+            gainS.gain.setValueAtTime(vol, rNextBeat);
+            gainS.gain.exponentialRampToValueAtTime(0.001, rNextBeat + 0.18);
+            oscS.start(rNextBeat); oscS.stop(rNextBeat + 0.2);
 
-            nextBeatTime += beatInterval;
-            stepCount++;
+            rNextBeat += beatInterval;
+            rStepCount++;
         }
-        audioLoopId = setTimeout(scheduler, 25);
+        rAudioLoop = setTimeout(rhythmScheduler, 25);
     }
 
-    let lastBeatTimeLocal = 0;
-    function triggerBeatVisual() {
-        lastBeatTimeLocal = Date.now();
-        rhythmIndicator.classList.remove('flash-cyan');
-        void rhythmIndicator.offsetWidth;
-        rhythmIndicator.classList.add('flash-cyan');
-
-        rhythmCore.classList.remove('flash-pink');
-        void rhythmCore.offsetWidth;
-        rhythmCore.classList.add('flash-pink');
-
-        bgPulse = currentTrackIndex === 0 ? 0.25 : 0.15; // Сильные огненные вспышки для Rush E!
+    function triggerRhythmBeatVisual() {
+        rLastBeatTime = Date.now();
+        rIndicator.classList.remove('flash-indicator');
+        void rIndicator.offsetWidth;
+        rIndicator.classList.add('flash-indicator');
+        rCore.classList.remove('flash-core');
+        void rCore.offsetWidth;
+        rCore.classList.add('flash-core');
+        rBgPulse = rCurrentTrackIndex === 0 ? 0.25 : 0.2;
     }
 
-    // Игровой цикл и механики
-    let gameActive = false;
-    let score = 0;
-    let combo = 1;
-    let bgPulse = 0;
-    const gravity = 0.6;
+    function startRhythmGame() {
+        rGameActive = true;
+        initRhythmAudio();
+        rScore = 0; rCombo = 1;
+        rScoreVal.textContent = rScore;
+        rComboVal.textContent = rCombo;
+        rComboBoard.style.display = 'none';
+        rObstacles = []; rParticles = [];
+        rPlayer.y = rCanvas.height - 120;
+        rPlayer.vy = 0; rPlayer.isJumping = false;
+        rPlayer.angle = 0; rPlayer.targetAngle = 0;
+        rObstacleTimer = 0;
+        rOverlay.style.opacity = '0';
+        rOverlay.style.pointerEvents = 'none';
+    }
 
-    const player = {
-        x: 80,
-        y: 0,
-        width: 60,
-        height: 40,
-        vy: 0,
-        isJumping: false,
-        angle: 0,
-        targetAngle: 0,
-        reelAngle: 0
-    };
+    function stopRhythm() {
+        rGameActive = false;
+        if (rAudioLoop) clearTimeout(rAudioLoop);
+        if (realAudio) {
+            realAudio.pause();
+            realAudio = null;
+        }
+    }
 
-    let obstacles = [];
-    let obstacleTimer = 0;
-    let baseSpeed = 5;
-    let particles = [];
+    function rhythmJump() {
+        if (!rGameActive || rPlayer.isJumping) return;
+        rPlayer.vy = -12;
+        rPlayer.isJumping = true;
+        rPlayer.targetAngle = Math.PI * 2;
 
-    function spawnParticle(x, y, color, count = 5) {
+        const now = Date.now();
+        
+        // ПРИМЕНЯЕМ КАЛИБРОВКУ ЗАДЕРЖКИ
+        // Смещаем время зафиксированного удара на значение ползунка
+        const calibratedLastBeat = rLastBeatTime + latencyOffset;
+        
+        const diff = now - calibratedLastBeat;
+        const beatMs = (60 / rCurrentTrack.bpm) * 1000;
+        const toNext = beatMs - diff;
+        
+        // Окно идеального попадания
+        const tolerance = 125; 
+
+        if (Math.abs(diff) <= tolerance || Math.abs(toNext) <= tolerance) {
+            rCombo++;
+            rScore += 10 * rCombo;
+            rComboBoard.style.display = 'block';
+            rComboVal.textContent = rCombo;
+            spawnRhythmParticles(rPlayer.x + 30, rPlayer.y + 20, rCurrentTrack.color2, 12);
+            rFeedbackText = "В БИТ! PERFECT"; rFeedbackColor = rCurrentTrack.color2; rFeedbackTimer = 30;
+        } else {
+            rCombo = 1;
+            rComboBoard.style.display = 'none';
+            rScore += 5;
+            spawnRhythmParticles(rPlayer.x + 30, rPlayer.y + 20, rCurrentTrack.color1, 4);
+            rFeedbackText = "Мимо бита"; rFeedbackColor = "#777"; rFeedbackTimer = 30;
+        }
+        rScoreVal.textContent = rScore;
+    }
+
+    function spawnRhythmParticles(x, y, color, count) {
         for (let i = 0; i < count; i++) {
-            particles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 8,
-                vy: (Math.random() - 0.5) * 8,
-                size: Math.random() * 4 + 2,
-                color: color,
-                alpha: 1,
-                decay: Math.random() * 0.05 + 0.02
+            rParticles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+                size: Math.random() * 4 + 2, color, alpha: 1, decay: Math.random() * 0.05 + 0.02
             });
         }
     }
 
-    function resetGame() {
-        score = 0;
-        combo = 1;
-        scoreVal.textContent = score;
-        comboVal.textContent = combo;
-        comboBoard.style.display = 'none';
-        obstacles = [];
-        particles = [];
-        player.y = canvas.height - 120;
-        player.vy = 0;
-        player.isJumping = false;
-        player.angle = 0;
-        player.targetAngle = 0;
-        baseSpeed = currentTrack.speed;
-        obstacleTimer = 0;
+    function rHexToRgb(hex) {
+        const bigint = parseInt(hex.replace('#', ''), 16);
+        return `${(bigint >> 16) & 255}, ${(bigint >> 8) & 255}, ${bigint & 255}`;
     }
 
-    function jump() {
-        if (!gameActive) return;
+    function updateRhythm() {
+        if (document.getElementById('screen-rhythm').classList.contains('active')) {
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            
+            // Если играет MP3 - сканируем ритм в реальном времени!
+            if (rGameActive && realAudio && !realAudio.paused) {
+                analyzeAudioRhythm();
+            }
 
-        if (!player.isJumping) {
-            player.vy = -12;
-            player.isJumping = true;
-            player.targetAngle = Math.PI * 2;
-
-            const now = Date.now();
-            const msSinceLastBeat = now - lastBeatTimeLocal;
-            const beatIntervalMs = (60 / currentTrack.bpm) * 1000;
-            const msToNextBeat = beatIntervalMs - msSinceLastBeat;
-            const tolerance = 110; 
-
-            if (msSinceLastBeat <= tolerance || msToNextBeat <= tolerance) {
-                combo++;
-                score += 10 * combo;
-                comboBoard.style.display = 'block';
-                comboVal.textContent = combo;
-                
-                spawnParticle(player.x + player.width/2, player.y + player.height/2, currentTrack.color2, 15);
-                showTextFeedback("КРАСАВА В БИТ!", currentTrack.color2);
-            } else {
-                combo = 1;
-                comboBoard.style.display = 'none';
-                score += 5;
-                spawnParticle(player.x + player.width/2, player.y + player.height/2, currentTrack.color1, 5);
-                showTextFeedback("НЕ В ТАКТ", currentTrack.color1);
+            // Рисуем музыкальный спектрометр на заднем фоне, если играет MP3!
+            if (rGameActive && rAnalyser && fDataArray && rCurrentTrack.mp3Loaded) {
+                rCtx.fillStyle = "rgba(0, 242, 254, 0.03)";
+                const barWidth = (rCanvas.width / rAnalyser.frequencyBinCount) * 1.5;
+                for (let i = 0; i < rAnalyser.frequencyBinCount; i++) {
+                    const barHeight = fDataArray[i] * 1.2;
+                    rCtx.fillRect(i * barWidth, rCanvas.height - 80 - barHeight, barWidth - 2, barHeight);
+                }
             }
             
-            scoreVal.textContent = score;
+            // Grid
+            rCtx.strokeStyle = "rgba(0, 242, 254, 0.05)";
+            rCtx.lineWidth = 1;
+            const speedOff = (Date.now() / 20) % 40;
+            for (let y = 0; y < rCanvas.height; y += 40) {
+                rCtx.beginPath(); rCtx.moveTo(0, y + speedOff*0.3); rCtx.lineTo(rCanvas.width, y + speedOff*0.3); rCtx.stroke();
+            }
+            // Floor
+            const groundY = rCanvas.height - 80;
+            rCtx.strokeStyle = rCurrentTrack.color2;
+            rCtx.shadowBlur = 10; rCtx.shadowColor = rCurrentTrack.color2; rCtx.lineWidth = 4;
+            rCtx.beginPath(); rCtx.moveTo(0, groundY); rCtx.lineTo(rCanvas.width, groundY); rCtx.stroke();
+            rCtx.shadowBlur = 0;
+
+            if (rBgPulse > 0) {
+                rCtx.fillStyle = `rgba(${rHexToRgb(rCurrentTrack.color1)}, ${rBgPulse})`;
+                rCtx.fillRect(0, 0, rCanvas.width, rCanvas.height);
+                rBgPulse -= 0.012;
+            }
+
+            if (rGameActive) {
+                rPlayer.vy += 0.6; // Gravity
+                rPlayer.y += rPlayer.vy;
+                if (rPlayer.y >= groundY - rPlayer.height) {
+                    rPlayer.y = groundY - rPlayer.height;
+                    rPlayer.vy = 0; rPlayer.isJumping = false;
+                }
+
+                // Obstacles
+                rObstacleTimer++;
+                const rate = Math.floor((60 / rCurrentTrack.bpm) * 60 * 2.3);
+                if (rObstacleTimer >= rate) {
+                    rObstacleTimer = 0;
+                    rObstacles.push({ x: rCanvas.width + 50, y: groundY - 35, w: 30, h: 35 });
+                }
+
+                for (let i = rObstacles.length - 1; i >= 0; i--) {
+                    const obs = rObstacles[i];
+                    obs.x -= rCurrentTrack.speed;
+
+                    rCtx.fillStyle = rCurrentTrack.color1;
+                    rCtx.fillRect(obs.x, obs.y, obs.w, obs.h);
+
+                    // Collision
+                    if (rPlayer.x < obs.x + obs.w && rPlayer.x + rPlayer.width > obs.x &&
+                        rPlayer.y < obs.y + obs.h && rPlayer.y + rPlayer.height > obs.y) {
+                        rGameOver();
+                    }
+                    if (obs.x + obs.w < 0) rObstacles.splice(i, 1);
+                }
+
+                // Particles
+                for (let i = rParticles.length - 1; i >= 0; i--) {
+                    const p = rParticles[i];
+                    p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
+                    rCtx.fillStyle = p.color;
+                    rCtx.globalAlpha = Math.max(0, p.alpha);
+                    rCtx.fillRect(p.x, p.y, p.size, p.size);
+                    rCtx.globalAlpha = 1;
+                    if (p.alpha <= 0) rParticles.splice(i, 1);
+                }
+            }
+
+            // Draw player (Cassette)
+            rCtx.save();
+            rCtx.translate(rPlayer.x + 30, rPlayer.y + 20);
+            if (rPlayer.angle < rPlayer.targetAngle) {
+                rPlayer.angle += 0.2;
+                if (rPlayer.angle >= rPlayer.targetAngle) { rPlayer.angle = 0; rPlayer.targetAngle = 0; }
+            }
+            rCtx.rotate(rPlayer.angle);
+            rCtx.fillStyle = "#0d0e15";
+            rCtx.strokeStyle = rCurrentTrack.color1; rCtx.lineWidth = 3;
+            rCtx.beginPath(); rCtx.roundRect(-30, -20, 60, 40, 5); rCtx.fill(); rCtx.stroke();
+            // Reels
+            rPlayer.reel += 0.05;
+            [-12, 12].forEach(ox => {
+                rCtx.save(); rCtx.translate(ox, 2); rCtx.rotate(rPlayer.reel);
+                rCtx.fillStyle = "#fff"; rCtx.beginPath(); rCtx.arc(0,0, 10, 0, Math.PI*2); rCtx.fill();
+                rCtx.fillStyle = rCurrentTrack.color1; rCtx.fillRect(-2, -10, 4, 3);
+                rCtx.restore();
+            });
+            rCtx.restore();
+
+            // Feedback
+            if (rFeedbackTimer > 0) {
+                rCtx.font = "bold 16px 'Courier New'"; rCtx.fillStyle = rFeedbackColor; rCtx.textAlign = "center";
+                rCtx.fillText(rFeedbackText, rCanvas.width/2, rCanvas.height/2 - 60);
+                rFeedbackTimer--;
+            }
         }
+        requestAnimationFrame(updateRhythm);
     }
 
-    let feedbackText = "";
-    let feedbackColor = "#fff";
-    let feedbackTimer = 0;
-    function showTextFeedback(text, color) {
-        feedbackText = text;
-        feedbackColor = color;
-        feedbackTimer = 30;
-    }
-
-    function triggerJumpInput(e) {
-        e.preventDefault();
-        if (gameActive) jump();
-    }
-    canvas.addEventListener('touchstart', triggerJumpInput, {passive: false});
-    canvas.addEventListener('mousedown', triggerJumpInput);
-
-    window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            e.preventDefault();
-            jump();
+    function rGameOver() {
+        rGameActive = false;
+        if (rAudioLoop) clearTimeout(rAudioLoop);
+        if (realAudio) {
+            realAudio.pause();
+            realAudio = null;
         }
-    });
-
-    startBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        initAudio();
-        resetGame();
-        uiOverlay.style.opacity = '0';
+        spawnRhythmParticles(rPlayer.x+30, rPlayer.y+20, "#ff007f", 30);
         setTimeout(() => {
-            uiOverlay.style.pointerEvents = 'none';
-        }, 300);
-        gameActive = true;
-    });
-
-    function drawPlayer() {
-        ctx.save();
-        ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-        
-        if (player.angle < player.targetAngle) {
-            player.angle += 0.2;
-            if (player.angle >= player.targetAngle) {
-                player.angle = 0;
-                player.targetAngle = 0;
-            }
-        }
-        ctx.rotate(player.angle);
-
-        let xOff = 0, yOff = 0;
-        if (Math.random() < 0.08) {
-            xOff = (Math.random() - 0.5) * 5;
-            yOff = (Math.random() - 0.5) * 3;
-        }
-
-        // Рисуем кассету
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = currentTrack.color1;
-        ctx.fillStyle = "#0d0e15";
-        ctx.strokeStyle = currentTrack.color1;
-        ctx.lineWidth = 3;
-        
-        ctx.beginPath();
-        ctx.roundRect(-player.width/2 + xOff, -player.height/2 + yOff, player.width, player.height, 5);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = "#1b1c2b";
-        ctx.strokeStyle = currentTrack.color2;
-        ctx.shadowColor = currentTrack.color2;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(-player.width/2 + 8 + xOff, -player.height/2 + 6 + yOff, player.width - 16, player.height - 18, 3);
-        ctx.fill();
-        ctx.stroke();
-
-        // Катушки
-        player.reelAngle += 0.06; // катушки крутятся быстрее в Rush E!
-        const rSize = 10;
-        
-        [-12, 12].forEach(posX => {
-            ctx.save();
-            ctx.translate(posX + xOff, 2 + yOff);
-            ctx.rotate(player.reelAngle);
-            ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.arc(0, 0, rSize, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "#0d0e15";
-            ctx.beginPath();
-            ctx.arc(0, 0, rSize - 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = currentTrack.color1;
-            for (let i = 0; i < 6; i++) {
-                ctx.rotate(Math.PI / 3);
-                ctx.fillRect(-2, -rSize, 4, 3);
-            }
-            ctx.restore();
-        });
-
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = currentTrack.color1;
-        ctx.strokeStyle = currentTrack.color1;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(-15, player.height/2 - 4);
-        ctx.bezierCurveTo(-5, player.height/2 + 8, 5, player.height/2 + 8, 15, player.height/2 - 4);
-        ctx.stroke();
-
-        ctx.restore();
-    }
-
-    function update() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Фоновая сетка
-        ctx.strokeStyle = currentTrackIndex === 0 ? "rgba(255, 0, 0, 0.08)" : "rgba(0, 242, 254, 0.05)";
-        ctx.lineWidth = 1;
-        const gridGap = 40;
-        const speedOffset = (Date.now() / 15) % gridGap; // сетка летит быстрее
-        
-        for (let y = 0; y < canvas.height; y += gridGap) {
-            ctx.beginPath();
-            ctx.moveTo(0, y + (speedOffset * 0.3));
-            ctx.lineTo(canvas.width, y + (speedOffset * 0.3));
-            ctx.stroke();
-        }
-        for (let x = 0; x < canvas.width; x += gridGap) {
-            ctx.beginPath();
-            ctx.moveTo(x - (speedOffset * 0.5), 0);
-            ctx.lineTo(x - (speedOffset * 0.5), canvas.height);
-            ctx.stroke();
-        }
-
-        // Пол
-        const groundY = canvas.height - 80;
-        ctx.strokeStyle = currentTrack.color2;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = currentTrack.color2;
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(0, groundY);
-        ctx.lineTo(canvas.width, groundY);
-        ctx.stroke();
-
-        // Фоновый импульс в цвет песни
-        if (bgPulse > 0) {
-            ctx.fillStyle = `rgba(${hexToRgb(currentTrack.color1)}, ${bgPulse})`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            bgPulse -= 0.015;
-        }
-
-        if (gameActive) {
-            player.vy += gravity;
-            player.y += player.vy;
-
-            if (player.y >= groundY - player.height) {
-                player.y = groundY - player.height;
-                player.vy = 0;
-                player.isJumping = false;
-            }
-
-            // Частота появления препятствий для Rush E
-            obstacleTimer++;
-            const beatIntervalSec = 60 / currentTrack.bpm;
-            // Для Rush E спавним препятствия чаще и динамичнее
-            const spawnDivisor = currentTrackIndex === 0 ? 1.8 : 2.3;
-            const spawnRate = Math.floor(beatIntervalSec * 60 * spawnDivisor); 
-            if (obstacleTimer >= spawnRate) {
-                obstacleTimer = 0;
-                obstacles.push({
-                    x: canvas.width + 50,
-                    y: groundY - 35,
-                    width: 25 + Math.random() * 20,
-                    height: 35,
-                    glitched: Math.random() < 0.4
-                });
-            }
-
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obs = obstacles[i];
-                obs.x -= baseSpeed;
-
-                ctx.save();
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = currentTrack.color1;
-                ctx.fillStyle = currentTrack.color1;
-                
-                if (obs.glitched && Math.random() < 0.3) {
-                    ctx.fillStyle = currentTrack.color2;
-                    ctx.shadowColor = currentTrack.color2;
-                    ctx.fillRect(obs.x + (Math.random()-0.5)*10, obs.y, obs.width, obs.height);
-                } else {
-                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-                    ctx.fillStyle = "#fff";
-                    ctx.fillRect(obs.x + 4, obs.y + 4, 6, 6);
-                }
-                ctx.restore();
-
-                // Столкновение
-                if (
-                    player.x < obs.x + obs.width &&
-                    player.x + player.width > obs.x &&
-                    player.y < obs.y + obs.height &&
-                    player.y + player.height > obs.y
-                ) {
-                    gameOver();
-                }
-
-                if (obs.x + obs.width < 0) {
-                    obstacles.splice(i, 1);
-                }
-            }
-
-            // Ускорение игры
-            baseSpeed += currentTrackIndex === 0 ? 0.001 : 0.0006;
-
-            // Обновление частиц
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.alpha -= p.decay;
-                
-                ctx.save();
-                ctx.globalAlpha = p.alpha;
-                ctx.fillStyle = p.color;
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size);
-                ctx.restore();
-
-                if (p.alpha <= 0) {
-                    particles.splice(i, 1);
-                }
-            }
-        }
-
-        drawPlayer();
-
-        if (feedbackTimer > 0) {
-            ctx.save();
-            ctx.font = "italic bold 18px 'Courier New'";
-            ctx.fillStyle = feedbackColor;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = feedbackColor;
-            ctx.textAlign = "center";
-            ctx.fillText(feedbackText, canvas.width / 2, canvas.height / 2 - 50);
-            ctx.restore();
-            feedbackTimer--;
-        }
-
-        requestAnimationFrame(update);
-    }
-
-    function gameOver() {
-        gameActive = false;
-        if (audioLoopId) clearTimeout(audioLoopId);
-        
-        spawnParticle(player.x + player.width/2, player.y + player.height/2, currentTrack.color1, 40);
-        spawnParticle(player.x + player.width/2, player.y + player.height/2, currentTrack.color2, 40);
-
-        setTimeout(() => {
-            overlayTitle.textContent = "СИСТЕМА СБОИЛА";
-            overlayTitle.style.textShadow = `0 0 10px ${currentTrack.color1}`;
-            overlayDesc.innerHTML = `
-                Ритм сломан под <span class="highlight">${currentTrack.name}</span>.<br><br>
-                Твой итоговый счет: <span class="highlight">${score}</span> очков!<br>
-                Синхронизация с битом: <span class="highlight">${Math.min(100, combo * 10)}%</span>
-            `;
-            startBtn.textContent = "СБРОСИТЬ";
-            uiOverlay.style.pointerEvents = 'auto';
-            uiOverlay.style.opacity = '1';
+            document.getElementById('rhythm-overlay').style.pointerEvents = 'auto';
+            document.getElementById('rhythm-overlay').style.opacity = '1';
+            checkMP3File();
         }, 1000);
     }
 
-    function hexToRgb(hex) {
-        const bigint = parseInt(hex.replace('#', ''), 16);
-        const r = (bigint >> 16) & 255;
-        const g = (bigint >> 8) & 255;
-        const b = bigint & 255;
-        return `${r}, ${g}, ${b}`;
+    rCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); rhythmJump(); });
+    rCanvas.addEventListener('mousedown', rhythmJump);
+    updateRhythm();
+
+
+    // ==========================================
+    // ⚽ ДИСЦИПЛИНА 2: ФУТБОЛЬНОЕ ДВОЕБОРЬЕ
+    // ==========================================
+    const sCanvas = document.getElementById('soccerCanvas');
+    const sCtx = sCanvas.getContext('2d');
+    const sOverlay = document.getElementById('soccer-overlay');
+    const sScoreVal = document.getElementById('soccer-score-val');
+
+    function resizeSoccerCanvas() {
+        const parent = sCanvas.parentElement;
+        sCanvas.width = parent.clientWidth;
+        sCanvas.height = parent.clientHeight;
     }
 
-    update();
+    let sState = 0; 
+    let sScore = 0, sAttempts = 0;
+    let sGateWidth = 280, sKeeperX = 0, sKeeperDir = 1, sKeeperSpeed = 4;
+    let sBall = { x: 0, y: 0, r: 15, vx: 0, vy: 0, active: false };
+    let sLockVal = 0, sLockDir = 1, sLockSpeed = 0.05, sLockTarget = 0.5;
+    let sMessage = "", sMsgColor = "#39ff14", sMsgTimer = 0;
+
+    function startSoccerGame() {
+        sScore = 0; sAttempts = 0;
+        sScoreVal.textContent = sScore;
+        resetSoccerRound();
+        sOverlay.style.opacity = '0';
+        sOverlay.style.pointerEvents = 'none';
+    }
+
+    function stopSoccer() {
+        sState = 0;
+    }
+
+    function resetSoccerRound() {
+        sState = 1; 
+        sKeeperX = sCanvas.width / 2 - 40;
+        sKeeperSpeed = 4 + (sAttempts * 0.4); 
+        sBall.x = sCanvas.width / 2;
+        sBall.y = sCanvas.height - 100;
+        sBall.vx = 0; sBall.vy = 0;
+        sBall.active = false;
+        sLockVal = 0;
+    }
+
+    function soccerAction() {
+        if (sState === 1) {
+            const accuracy = Math.abs(sLockVal - sLockTarget);
+            if (accuracy < 0.1) {
+                sMessage = "СИНХРОНИЗАЦИЯ: 100% (ИДЕАЛЬНЫЙ УДАР!)";
+                sMsgColor = "#39ff14";
+                sBall.vy = -12;
+            } else if (accuracy < 0.25) {
+                sMessage = "СИНХРОНИЗАЦИЯ: 60% (Средняя сила)";
+                sMsgColor = "#00f2fe";
+                sBall.vy = -9;
+                sBall.vx = (Math.random() - 0.5) * 4;
+            } else {
+                sMessage = "СИНХРОНИЗАЦИЯ: 15% (СЛАБЫЙ УДАР)";
+                sMsgColor = "#ff007f";
+                sBall.vy = -6;
+                sBall.vx = (Math.random() - 0.5) * 8;
+            }
+            sMsgTimer = 40;
+            sState = 3; 
+            sBall.active = true;
+            playSoccerSynth(accuracy);
+        }
+    }
+
+    function playSoccerSynth(acc) {
+        if (!rAudioCtx) rAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = rAudioCtx.createOscillator();
+        const gain = rAudioCtx.createGain();
+        osc.connect(gain); gain.connect(rAudioCtx.destination);
+        osc.frequency.setValueAtTime(acc < 0.1 ? 300 : 150, rAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, rAudioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.5, rAudioCtx.currentTime);
+        osc.start(); osc.stop(rAudioCtx.currentTime + 0.3);
+    }
+
+    function updateSoccer() {
+        if (document.getElementById('screen-soccer').classList.contains('active')) {
+            sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
+
+            sCtx.strokeStyle = "#fff"; sCtx.lineWidth = 6;
+            const gateX = sCanvas.width / 2 - sGateWidth / 2;
+            sCtx.strokeRect(gateX, 60, sGateWidth, 100);
+
+            sCtx.strokeStyle = "rgba(255,255,255,0.1)"; sCtx.lineWidth = 1;
+            for (let x = gateX; x < gateX + sGateWidth; x += 15) {
+                sCtx.beginPath(); sCtx.moveTo(x, 60); sCtx.lineTo(x, 160); sCtx.stroke();
+            }
+
+            sKeeperX += sKeeperSpeed * sKeeperDir;
+            if (sKeeperX <= gateX || sKeeperX + 50 >= gateX + sGateWidth) sKeeperDir *= -1;
+
+            sCtx.fillStyle = "rgba(0, 242, 254, 0.4)";
+            sCtx.strokeStyle = varColor('cyan'); sCtx.lineWidth = 3;
+            sCtx.beginPath(); sCtx.roundRect(sKeeperX, 110, 50, 45, 5); sCtx.fill(); sCtx.stroke();
+            sCtx.fillStyle = varColor('pink');
+            sCtx.fillRect(sKeeperX - 10, 120, 10, 10);
+            sCtx.fillRect(sKeeperX + 50, 120, 10, 10);
+
+            if (sState === 1) {
+                sLockVal += sLockSpeed * sLockDir;
+                if (sLockVal >= 1 || sLockVal <= 0) sLockDir *= -1;
+
+                const barY = sCanvas.height - 200;
+                sCtx.fillStyle = "#1b1c2b";
+                sCtx.fillRect(50, barY, sCanvas.width - 100, 25);
+                
+                sCtx.fillStyle = "rgba(57, 255, 20, 0.4)";
+                sCtx.fillRect(50 + (sCanvas.width - 100) * sLockTarget - 25, barY, 50, 25);
+
+                sCtx.fillStyle = varColor('pink');
+                sCtx.fillRect(50 + (sCanvas.width - 100) * sLockVal - 5, barY - 5, 10, 35);
+            }
+
+            if (sBall.active) {
+                sBall.x += sBall.vx;
+                sBall.y += sBall.vy;
+
+                if (sBall.y <= 160 && sBall.y >= 110 && sBall.x >= sKeeperX - 10 && sBall.x <= sKeeperX + 60) {
+                    sBall.active = false;
+                    sMessage = "СЕЙВ ВРАТАРЯ! ХАБ СБОИЛ"; sMsgColor = "#ff007f"; sMsgTimer = 50;
+                    sAttempts++;
+                    setTimeout(nextSoccerRound, 1200);
+                }
+                else if (sBall.y <= 110 && sBall.x >= gateX && sBall.x <= gateX + sGateWidth) {
+                    sBall.active = false;
+                    sScore++;
+                    sAttempts++;
+                    sScoreVal.textContent = sScore;
+                    sMessage = "ГООООЛ! СЕТЬ СИНХРОНИЗИРОВАНА"; sMsgColor = "#39ff14"; sMsgTimer = 50;
+                    setTimeout(nextSoccerRound, 1200);
+                }
+                else if (sBall.y < 0 || sBall.x < 0 || sBall.x > sCanvas.width) {
+                    sBall.active = false;
+                    sMessage = "ПРОМАХ МИМО СЕТИ"; sMsgColor = "#ff5e00"; sMsgTimer = 50;
+                    sAttempts++;
+                    setTimeout(nextSoccerRound, 1200);
+                }
+            }
+
+            sCtx.save();
+            sCtx.beginPath(); sCtx.arc(sBall.x, sBall.y, sBall.r, 0, Math.PI*2); sCtx.clip();
+            sCtx.fillStyle = "#fff"; sCtx.fillRect(sBall.x - sBall.r, sBall.y - sBall.r, sBall.r, sBall.r*2);
+            sCtx.strokeStyle = "#000"; sCtx.lineWidth = 2;
+            sCtx.beginPath(); sCtx.arc(sBall.x, sBall.y, sBall.r, 0, Math.PI*2); sCtx.stroke();
+            sCtx.fillStyle = "rgba(57, 255, 20, 0.8)"; sCtx.fillRect(sBall.x, sBall.y - sBall.r, sBall.r, sBall.r*2);
+            sCtx.restore();
+
+            if (sMsgTimer > 0) {
+                sCtx.font = "bold 14px 'Courier New'"; sCtx.fillStyle = sMsgColor; sCtx.textAlign = "center";
+                sCtx.fillText(sMessage, sCanvas.width/2, sCanvas.height/2);
+                sMsgTimer--;
+            }
+        }
+        requestAnimationFrame(updateSoccer);
+    }
+
+    function nextSoccerRound() {
+        if (sAttempts >= 10) {
+            document.getElementById('soccer-overlay-title').textContent = "ТУРНИР ЗАВЕРШЕН";
+            document.getElementById('soccer-overlay-desc').innerHTML = `
+                Твой фиджитал-результат в футболе:<br><br>
+                Забито голов: <span class="highlight" style="color:var(--color-green)">${sScore}</span> из 10!<br>
+                Уровень фиджитал-баланса: <span class="highlight" style="color:var(--color-green)">${sScore * 10}%</span>
+            `;
+            document.getElementById('soccer-start-btn').textContent = "ЗАНОВО";
+            sOverlay.style.pointerEvents = 'auto';
+            sOverlay.style.opacity = '1';
+        } else {
+            resetSoccerRound();
+        }
+    }
+
+    sCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); soccerAction(); });
+    sCanvas.addEventListener('mousedown', soccerAction);
+    updateSoccer();
+
+
+    // ==========================================
+    // 🏀 ДИСЦИПЛИНА 3: БАСКЕТБОЛЬНОЕ ДВОЕБОРЬЕ
+    // ==========================================
+    const bCanvas = document.getElementById('basketCanvas');
+    const bCtx = bCanvas.getContext('2d');
+    const bOverlay = document.getElementById('basket-overlay');
+    const bScoreVal = document.getElementById('basket-score-val');
+
+    function resizeBasketCanvas() {
+        const parent = bCanvas.parentElement;
+        bCanvas.width = parent.clientWidth;
+        bCanvas.height = parent.clientHeight;
+    }
+
+    let bGameActive = false, bScore = 0, bPower = 0, bPowerDir = 1, bPowerActive = false;
+    let bHoop = { x: 100, y: 120, w: 70, speed: 3, dir: 1 };
+    let bBall = { x: 0, y: 0, r: 16, vx: 0, vy: 0, gravity: 0.45, active: false };
+    let bMessage = "", bMsgColor = "#ff5e00", bMsgTimer = 0;
+
+    function startBasketGame() {
+        bScore = 0; bScoreVal.textContent = bScore;
+        resetBasketRound();
+        bGameActive = true;
+        bOverlay.style.opacity = '0';
+        bOverlay.style.pointerEvents = 'none';
+    }
+
+    function stopBasket() {
+        bGameActive = false;
+    }
+
+    function resetBasketRound() {
+        bBall.x = bCanvas.width / 2;
+        bBall.y = bCanvas.height - 120;
+        bBall.vx = 0; bBall.vy = 0;
+        bBall.active = false;
+        bPowerActive = true; bPower = 0;
+    }
+
+    function basketActionStart() {
+        if (bGameActive && bPowerActive) {
+            bPowerActive = false; 
+            const angle = -Math.PI / 2.3; 
+            const force = 9 + (bPower * 7); 
+            bBall.vx = Math.cos(angle) * force * (Math.random() < 0.5 ? -1 : 1); 
+            const dx = bHoop.x + bHoop.w/2 - bBall.x;
+            bBall.vx = dx * 0.035; 
+            bBall.vy = -force;
+            bBall.active = true;
+            playBasketSynth();
+        }
+    }
+
+    function playBasketSynth() {
+        if (!rAudioCtx) rAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = rAudioCtx.createOscillator();
+        const gain = rAudioCtx.createGain();
+        osc.connect(gain); gain.connect(rAudioCtx.destination);
+        osc.frequency.setValueAtTime(440, rAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, rAudioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.3, rAudioCtx.currentTime);
+        osc.start(); osc.stop(rAudioCtx.currentTime + 0.25);
+    }
+
+    function updateBasket() {
+        if (document.getElementById('screen-basketball').classList.contains('active')) {
+            bCtx.clearRect(0, 0, bCanvas.width, bCanvas.height);
+
+            bCtx.strokeStyle = "rgba(255, 94, 0, 0.05)"; bCtx.lineWidth = 1;
+            for (let i = 0; i < bCanvas.width; i += 40) {
+                bCtx.beginPath(); bCtx.moveTo(i, 0); bCtx.lineTo(i, bCanvas.height); bCtx.stroke();
+            }
+
+            bHoop.x += bHoop.speed * bHoop.dir;
+            if (bHoop.x <= 20 || bHoop.x + bHoop.w >= bCanvas.width - 20) bHoop.dir *= -1;
+
+            bCtx.strokeStyle = "rgba(255, 255, 255, 0.3)"; bCtx.lineWidth = 5;
+            bCtx.strokeRect(bHoop.x - 10, bHoop.y - 40, bHoop.w + 20, 50); 
+            bCtx.strokeStyle = varColor('orange'); bCtx.lineWidth = 4;
+            bCtx.strokeRect(bHoop.x, bHoop.y, bHoop.w, 8); 
+
+            bCtx.strokeStyle = "rgba(255,255,255,0.4)"; bCtx.lineWidth = 2;
+            bCtx.beginPath();
+            bCtx.moveTo(bHoop.x, bHoop.y + 8); bCtx.lineTo(bHoop.x + 15, bHoop.y + 35);
+            bCtx.lineTo(bHoop.x + bHoop.w - 15, bHoop.y + 35); bCtx.lineTo(bHoop.x + bHoop.w, bHoop.y + 8);
+            bCtx.stroke();
+
+            if (bPowerActive) {
+                bPower += 0.03 * bPowerDir;
+                if (bPower >= 1 || bPower <= 0) bPowerDir *= -1;
+
+                bCtx.fillStyle = "#1b1c2b";
+                bCtx.fillRect(bCanvas.width - 40, bCanvas.height - 250, 15, 120);
+                bCtx.fillStyle = varColor('orange');
+                bCtx.fillRect(bCanvas.width - 40, bCanvas.height - 130 - (bPower * 120), 15, bPower * 120);
+            }
+
+            if (bBall.active) {
+                bBall.vy += bBall.gravity;
+                bBall.x += bBall.vx;
+                bBall.y += bBall.vy;
+
+                if (bBall.vy > 0 && bBall.y >= bHoop.y - 5 && bBall.y <= bHoop.y + 15 &&
+                    bBall.x >= bHoop.x && bBall.x <= bHoop.x + bHoop.w) {
+                    bBall.active = false;
+                    bScore++;
+                    bScoreVal.textContent = bScore;
+                    bMessage = "SLAM DUNK! КЭН РУЛИТ"; bMsgColor = "#ff5e00"; bMsgTimer = 45;
+                    playDunkSound();
+                    setTimeout(resetBasketRound, 1000);
+                }
+
+                if (bBall.y > bCanvas.height) {
+                    bBall.active = false;
+                    bMessage = "ПРОМАХ"; bMsgColor = "#555"; bMsgTimer = 35;
+                    setTimeout(resetBasketRound, 1000);
+                }
+            }
+
+            if (bBall.active) {
+                for (let i = 0; i < 5; i++) {
+                    bCtx.fillStyle = Math.random() < 0.5 ? varColor('orange') : "#ff007f";
+                    bCtx.fillRect(bBall.x - 10 + Math.random()*20 - bBall.vx*i, bBall.y + 5 - bBall.vy*i, 6, 6);
+                }
+            }
+
+            bCtx.fillStyle = "#fff"; bCtx.strokeStyle = varColor('orange'); bCtx.lineWidth = 3;
+            bCtx.beginPath(); bCtx.arc(bBall.x, bBall.y, bBall.r, 0, Math.PI*2); bCtx.fill(); bCtx.stroke();
+            bCtx.strokeStyle = "#0d0e15"; bCtx.lineWidth = 1.5;
+            bCtx.beginPath(); bCtx.moveTo(bBall.x - bBall.r, bBall.y); bCtx.lineTo(bBall.x + bBall.r, bBall.y); bCtx.stroke();
+            bCtx.beginPath(); bCtx.moveTo(bBall.x, bBall.y - bBall.r); bCtx.lineTo(bBall.x, bBall.y + bBall.r); bCtx.stroke();
+
+            if (bMsgTimer > 0) {
+                bCtx.font = "bold 15px 'Courier New'"; bCtx.fillStyle = bMsgColor; bCtx.textAlign = "center";
+                bCtx.fillText(bMessage, bCanvas.width/2, bCanvas.height/2);
+                bMsgTimer--;
+            }
+        }
+        requestAnimationFrame(updateBasket);
+    }
+
+    function playDunkSound() {
+        const osc = rAudioCtx.createOscillator();
+        const gain = rAudioCtx.createGain();
+        osc.connect(gain); gain.connect(rAudioCtx.destination);
+        osc.frequency.setValueAtTime(200, rAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, rAudioCtx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.6, rAudioCtx.currentTime);
+        osc.start(); osc.stop(rAudioCtx.currentTime + 0.4);
+    }
+
+    bCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); basketActionStart(); });
+    bCanvas.addEventListener('mousedown', basketActionStart);
+    updateBasket();
+
+    function varColor(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(`--color-${name}`).trim();
+    }
 </script>
 
 </body>
